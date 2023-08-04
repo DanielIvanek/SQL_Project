@@ -1,6 +1,5 @@
-
 #binarni promenna pro vikend/prac. den rocni obdobi 
-SELECT
+/*SELECT
     *,
     CASE 
         WHEN DAYOFWEEK(date) = 1 OR DAYOFWEEK(date) = 7 THEN 1
@@ -13,17 +12,28 @@ SELECT
         WHEN MONTH(date) IN (12, 1, 2) THEN 3 -- Zima
     END AS rocni_obdobi
 FROM
-    covid19_basic_differences cbd ;
+    covid19_basic_differences cbd ;*/
 
+CREATE TABLE base_table (
 
 SELECT
-	DISTINCT cbd.date,
-	ct.country,
+	cbd.date,
 	cbd.country,
 	cbd.confirmed,
 	ct.tests_performed,
 	c.population,
-	c.population_density 
+	c.population_density,
+	c.median_age_2018,
+	 CASE 
+        WHEN DAYOFWEEK(cbd.date) = 1 OR DAYOFWEEK(cbd.date) = 7 THEN 1
+        ELSE 0
+    END AS vikend_flag,
+    CASE 
+        WHEN MONTH(cbd.date) IN (3, 4, 5) THEN 0 -- Jaro
+        WHEN MONTH(cbd.date) IN (6, 7, 8) THEN 1 -- Léto
+        WHEN MONTH(cbd.date) IN (9, 10, 11) THEN 2 -- Podzim
+        WHEN MONTH(cbd.date) IN (12, 1, 2) THEN 3 -- Zima
+    END AS rocni_obdobi
 FROM
 	(
 	SELECT
@@ -54,11 +64,11 @@ ON
 	cbd.country = ct.country
 	AND cbd.date = ct.date
 LEFT JOIN countries c 
-ON cbd.country  = c.country ;
+ON cbd.country  = c.country
+);
 
 
-
-select distinct country
+/*select *
 from  covid19_tests ct 
 
 
@@ -66,8 +76,4 @@ except
 
 select distinct country
 from  covid19_basic_differences cbd
-
-
-
-
-
+*/
