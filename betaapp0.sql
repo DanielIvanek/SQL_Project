@@ -13,7 +13,7 @@
     END AS rocni_obdobi
 FROM
     covid19_basic_differences cbd ;*/
-
+/*
 CREATE TABLE base_table (
 
 SELECT
@@ -67,7 +67,7 @@ LEFT JOIN countries c
 ON cbd.country  = c.country
 );
 
-
+*/
 /*select *
 from  covid19_tests ct 
 
@@ -77,3 +77,52 @@ except
 select distinct country
 from  covid19_basic_differences cbd
 */
+/*
+SELECT date, country 
+FROM base_table
+
+EXCEPT
+
+SELECT date, country 
+FROM covid19_basic_differences
+
+*/
+
+SELECT country 
+FROM base_table
+
+EXCEPT
+
+SELECT DISTINCT CASE WHEN country = 'The Democratic Republic of Congo'
+						THEN 'Congo (Kinshasa)'
+					WHEN country = 'United States'
+						THEN 'US'
+					WHEN country = 'Congo'
+						THEN 'Congo (Brazzaville)'
+					WHEN country = 'Bahamas, The'
+						THEN 'Bahamas'
+					WHEN country = 'Brunei Darussalam'
+						THEN 'Brunei'
+					WHEN country = 'South Korea'
+						THEN 'Korea, South'
+					WHEN country = 'Micronesia, Fed. Sts.'
+						THEN 'Micronesia'
+					ELSE country
+				END AS country
+FROM economies e;
+
+
+/*ALTER TABLE danza_je_pepa.economies MODIFY COLUMN country VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL NULL;*/
+
+
+
+/*
+SELECT country 
+FROM base_table
+
+EXCEPT
+
+SELECT DISTINCT  country 
+FROM economies e;
+*/
+
