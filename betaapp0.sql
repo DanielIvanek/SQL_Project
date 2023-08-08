@@ -1,3 +1,4 @@
+
 #binarni promenna pro vikend/prac. den rocni obdobi 
 /*SELECT
     *,
@@ -88,28 +89,116 @@ FROM covid19_basic_differences
 
 */
 
-SELECT country 
-FROM base_table
 
-EXCEPT
-
-SELECT DISTINCT CASE WHEN country = 'The Democratic Republic of Congo'
+CREATE TABLE base_table_hdp
+(
+SELECT  
+		bt.`date`,
+		bt.confirmed,
+		bt.tests_performed,
+		bt.population,
+		bt.population_density,
+		bt.median_age_2018,
+		bt.vikend_flag,
+		bt.rocni_obdobi,
+		e.gini,
+		e.mortaliy_under5,
+		ROUND(e.GDP/ bt.population, 5) AS HDP_na_obyvatele,	
+CASE WHEN e.country = 'The Democratic Republic of Congo'
 						THEN 'Congo (Kinshasa)'
-					WHEN country = 'United States'
+					WHEN e.country = 'United States'
 						THEN 'US'
-					WHEN country = 'Congo'
+					WHEN e.country = 'Congo'
 						THEN 'Congo (Brazzaville)'
-					WHEN country = 'Bahamas, The'
+					WHEN e.country = 'Bahamas, The'
 						THEN 'Bahamas'
-					WHEN country = 'Brunei Darussalam'
+					WHEN e.country = 'Brunei Darussalam'
 						THEN 'Brunei'
-					WHEN country = 'South Korea'
+					WHEN e.country = 'South Korea'
 						THEN 'Korea, South'
-					WHEN country = 'Micronesia, Fed. Sts.'
+					WHEN e.country = 'Micronesia, Fed. Sts.'
 						THEN 'Micronesia'
-					ELSE country
-				END AS country
-FROM economies e;
+					ELSE e.country
+				END AS country 
+FROM economies e 
+LEFT JOIN base_table bt 
+ON e.country = bt.country AND YEAR(bt.`date`) = e.`year` + 1
+);
+
+
+
+SELECT
+	bth.population,
+	bth.country,
+	r.country,
+	r.religion,
+	r.population,
+	(SELECT round(r.population/bth.population * 100 , 2), r.religion, bth.country  
+		FROM base_table_hdp bth 
+		LEFT JOIN religions r 
+		ON bth.country = r.country
+		WHERE r.religion like 'Christianity' AND r.`year` = '2020'
+		GROUP BY r.`year`) AS smth
+FROM
+	base_table_hdp bth
+LEFT JOIN religions r 
+ON
+	bth.country = r.country
+WHERE
+	r.YEAR = '2020';
+
+
+
+CREATE VIEW rel_pr AS (
+SELECT 
+	bth.population AS bth_pop,
+	r.religion,
+	r.population AS rel_pop,
+	CASE WHEN r.country = 'Taiwan'
+		    THEN 'Taiwan*'
+		 WHEN r.country = 'US'
+		 	THEN 'United States'
+		 WHEN r.country = 'Federated States of Micronesia'
+		 	THEN 'Micronesia'
+		 WHEN r.country = 'South Korea'
+		 	THEN 'Korea, South'
+		 WHEN r.country = 'Congo'
+		 	THEN 'Congo (Brazzaville)'
+		 WHEN r.country = 'The Democratic Republic of Congo'
+		 	THEN 'Congo (Kinshasa)'
+		 WHEN r.country = 'Cape Verde'
+		 	THEN 'Cabo Verde'
+		 WHEN r.country = 'St. Vincent'
+		 	THEN 'Saint Vincent'
+		WHEN r.country = 'St. Kitts and Nevis'
+		   THEN 'Saint Kitts and Nevis'
+		WHEN r.country = 'St. Lucia'
+			THEN 'Saint Lucia'
+		WHEN r.country = 'St. Vincent and the Grenadines'
+			THEN 'Saint Vincent and the Grenadines'
+		ELSE r.country
+				END AS country,
+	bth.country AS bth_country,
+	bth.`date`
+FROM 
+	base_table_hdp bth 
+	LEFT JOIN religions r 
+	ON bth.country = r.country
+WHERE bth.date IN ('2020-01-29') AND r.`year` = '2020';
+
+
+SELECT *
+FROM rel_pr;
+
+
+
+
+
+
+
+
+
+
 
 
 /*ALTER TABLE danza_je_pepa.economies MODIFY COLUMN country VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL NULL;*/
@@ -125,4 +214,6 @@ EXCEPT
 SELECT DISTINCT  country 
 FROM economies e;
 */
+
+
 
