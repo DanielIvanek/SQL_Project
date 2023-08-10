@@ -149,7 +149,7 @@ WHERE
 
 
 
-CREATE VIEW rel_pr AS (
+CREATE VIEW rel_pr1 AS (
 SELECT 
 	bth.population AS bth_pop,
 	r.religion,
@@ -184,19 +184,14 @@ FROM
 	base_table_hdp bth 
 	LEFT JOIN religions r 
 	ON bth.country = r.country
-WHERE bth.date IN ('2020-01-29') AND r.`year` = '2020';
+WHERE bth.date IN ('2020-01-29') AND r.`year` = '2020');
+
+
+
 
 
 SELECT *
-FROM rel_pr;
-
-
-
-
-
-
-
-
+FROM rel_pr1;
 
 
 
@@ -217,3 +212,44 @@ FROM economies e;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+create VIEW  nwmuz as (
+SELECT country,
+	IF(religion = 'Christianity', round(rel_pop/bth_pop * 100 , 2),0) AS Christianity,
+	IF(religion = 'Islam', round(rel_pop/bth_pop * 100 , 2),0) AS Islam,
+	IF(religion = 'Judaism', round(rel_pop/bth_pop * 100 , 2),0) AS Judaism,
+	IF(religion = 'Unaffiliated Religions', round(rel_pop/bth_pop * 100 , 2),0) AS Unaffiliated_Religions,
+	IF(religion = 'Hinduism', round(rel_pop/bth_pop * 100 , 2),0) AS Hinduism,
+	IF(religion = 'Buddhism', round(rel_pop/bth_pop * 100 , 2),0) AS Buddhism,
+	IF(religion = 'Folk Religions', round(rel_pop/bth_pop * 100 , 2),0) AS Folk_religions,
+	IF(religion = 'Other Religions', round(rel_pop/bth_pop * 100 , 2),0) AS Other_religions
+FROM rel_pr1
+);
+
+
+
+
+SELECT bth.country,
+       MAX(nwmuz.Christianity) AS Christianity,
+       MAX(nwmuz.Islam) AS Islam,
+       MAX(nwmuz.Judaism) AS Judaism,
+       MAX(nwmuz.Unaffiliated_Religions) AS Unaffiliated_Religions,
+       MAX(nwmuz.Hinduism) AS Hinduism,
+       MAX(nwmuz.Buddhism) AS Buddhism,
+       MAX(nwmuz.Folk_religions) AS Folk_religions,
+       MAX(nwmuz.Other_religions) AS Other_religions
+FROM base_table_hdp bth
+LEFT JOIN nwmuz
+ON bth.country = nwmuz.country
+WHERE bth.`date` = '2020-01-29'
+GROUP BY bth.country;
