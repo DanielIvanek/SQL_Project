@@ -213,16 +213,6 @@ FROM economies e;
 
 
 
-
-
-
-
-
-
-
-
-
-
 create VIEW  nwmuz as (
 SELECT country,
 	IF(religion = 'Christianity', round(rel_pop/bth_pop * 100 , 2),0) AS Christianity,
@@ -235,7 +225,6 @@ SELECT country,
 	IF(religion = 'Other Religions', round(rel_pop/bth_pop * 100 , 2),0) AS Other_religions
 FROM rel_pr1
 );
-
 
 
 
@@ -253,3 +242,138 @@ LEFT JOIN nwmuz
 ON bth.country = nwmuz.country
 WHERE bth.`date` = '2020-01-29'
 GROUP BY bth.country;
+
+
+
+
+SELECT country
+FROM base_table_hdp bth 
+
+EXCEPT 
+
+SELECT DISTINCT country 
+FROM life_expectancy le
+
+
+SELECT	CASE WHEN country = 'US'
+		 	THEN 'United States'
+		 WHEN country = 'Federated States of Micronesia'
+		 	THEN 'Micronesia'
+		 WHEN country = 'South Korea'
+		 	THEN 'Korea, South'
+		 WHEN country = 'Congo'
+		 	THEN 'Congo (Brazzaville)'
+		 WHEN country = 'The Democratic Republic of Congo'
+		 	THEN 'Congo (Kinshasa)'
+		 WHEN country = 'Cape Verde'
+		 	THEN 'Cabo Verde'
+		 WHEN country = 'St. Vincent'
+		 	THEN 'Saint Vincent'
+		WHEN country = 'St. Kitts and Nevis'
+		   THEN 'Saint Kitts and Nevis'
+		WHEN country = 'St. Lucia'
+			THEN 'Saint Lucia'
+		WHEN country = 'St. Vincent and the Grenadines'
+			THEN 'Saint Vincent and the Grenadines'
+		ELSE country
+				END AS acountry,
+       MAX(CASE WHEN `year` = '2015' THEN life_expectancy END) -
+       MAX(CASE WHEN `year` = '1965' THEN life_expectancy END) AS life_expectancy_difference
+FROM life_expectancy
+WHERE `year` IN ('1965', '2015')
+GROUP BY country ;
+
+
+
+
+
+
+SELECT
+	AVG(temp) AS prum_den_tep,
+	city,
+	date
+FROM
+	weather
+WHERE
+	time IN ('06:00', '09:00', '12:00', '15:00', '18:00', '20:00') AND city IS NOT NULL 
+GROUP BY date, city;
+
+
+
+
+#počet hodin v daném dni, kdy byly srážky nenulové
+   SELECT
+	DATE_FORMAT(date, '%Y-%m-%d') AS formatted_date,
+	time,
+	city,
+	MAX(CAST(SUBSTRING_INDEX(gust, ' ', 1) AS UNSIGNED)) AS max_wind_gust
+FROM weather w
+GROUP BY date,city;
+
+
+
+SELECT
+	DATE_FORMAT(date, '%Y-%m-%d') AS formatted_date,
+	time,
+	city,
+	sum(pocet_hodin_se_srazky)
+FROM
+	(
+	SELECT
+		CASE
+			WHEN rain = 0 THEN 0
+			ELSE 3
+		END AS pocet_hodin_se_srazky,
+		date,
+		time,
+		city
+	FROM
+		weather) w
+WHERE
+	city IS NOT NULL
+GROUP BY
+	date,
+	city;
+
+
+
+
+
+SELECT 
+	AVG(temp) AS prum_den_tep,
+	city,
+	date
+FROM
+	weather
+WHERE
+	time IN ('06:00', '09:00', '12:00', '15:00', '18:00', '20:00') AND city IS NOT NULL 
+GROUP BY date, city;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
