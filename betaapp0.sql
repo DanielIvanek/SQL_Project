@@ -1,6 +1,6 @@
 
 #binarni promenna pro vikend/prac. den rocni obdobi 
-/*SELECT
+SELECT
     *,
     CASE 
         WHEN DAYOFWEEK(date) = 1 OR DAYOFWEEK(date) = 7 THEN 1
@@ -14,9 +14,9 @@
     END AS rocni_obdobi
 FROM
     covid19_basic_differences cbd ;*/
-/*
-CREATE TABLE base_table (
 
+   
+CREATE TABLE base_table (
 SELECT
 	cbd.date,
 	cbd.country,
@@ -72,12 +72,12 @@ ON cbd.country  = c.country
 /*select *
 from  covid19_tests ct 
 
-
 except
 
 select distinct country
 from  covid19_basic_differences cbd
 */
+
 /*
 SELECT date, country 
 FROM base_table
@@ -86,7 +86,6 @@ EXCEPT
 
 SELECT date, country 
 FROM covid19_basic_differences
-
 */
 
 
@@ -197,11 +196,11 @@ FROM rel_pr1;
 
 
 
-/*ALTER TABLE danza_je_pepa.economies MODIFY COLUMN country VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL NULL;*/
+/*ALTER TABLE engeto_project.economies MODIFY COLUMN country VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL NULL;*/
 
 
 
-/*
+
 SELECT country 
 FROM base_table
 
@@ -209,12 +208,12 @@ EXCEPT
 
 SELECT DISTINCT  country 
 FROM economies e;
-*/
 
 
 
 
-create VIEW  nwmuz as (
+
+create VIEW  rel_views as (
 SELECT country,
 	IF(religion = 'Christianity', round(rel_pop/bth_pop * 100 , 2),0) AS Christianity,
 	IF(religion = 'Islam', round(rel_pop/bth_pop * 100 , 2),0) AS Islam,
@@ -230,17 +229,17 @@ FROM rel_pr1
 
 /* nabozenstvi */
 SELECT bth.country,
-       MAX(nwmuz.Christianity) AS Christianity,
-       MAX(nwmuz.Islam) AS Islam,
-       MAX(nwmuz.Judaism) AS Judaism,
-       MAX(nwmuz.Unaffiliated_Religions) AS Unaffiliated_Religions,
-       MAX(nwmuz.Hinduism) AS Hinduism,
-       MAX(nwmuz.Buddhism) AS Buddhism,
-       MAX(nwmuz.Folk_religions) AS Folk_religions,
-       MAX(nwmuz.Other_religions) AS Other_religions
+       MAX(rel_views.Christianity) AS Christianity,
+       MAX(rel_views.Islam) AS Islam,
+       MAX(rel_views.Judaism) AS Judaism,
+       MAX(rel_views.Unaffiliated_Religions) AS Unaffiliated_Religions,
+       MAX(rel_views.Hinduism) AS Hinduism,
+       MAX(rel_views.Buddhism) AS Buddhism,
+       MAX(rel_views.Folk_religions) AS Folk_religions,
+       MAX(rel_views.Other_religions) AS Other_religions
 FROM base_table_hdp bth
-LEFT JOIN nwmuz
-ON bth.country = nwmuz.country
+LEFT JOIN rel_views
+ON bth.country = rel_views.country
 WHERE bth.`date` = '2020-01-29'
 GROUP BY bth.country;
 
@@ -379,17 +378,17 @@ SELECT bth.`date` ,
 rel.*
 FROM base_table_hdp bth
 LEFT JOIN (SELECT bth.country,
-       MAX(nwmuz.Christianity) AS Christianity,
-       MAX(nwmuz.Islam) AS Islam,
-       MAX(nwmuz.Judaism) AS Judaism,
-       MAX(nwmuz.Unaffiliated_Religions) AS Unaffiliated_Religions,
-       MAX(nwmuz.Hinduism) AS Hinduism,
-       MAX(nwmuz.Buddhism) AS Buddhism,
-       MAX(nwmuz.Folk_religions) AS Folk_religions,
-       MAX(nwmuz.Other_religions) AS Other_religions
+       MAX(rel_views.Christianity) AS Christianity,
+       MAX(rel_views.Islam) AS Islam,
+       MAX(rel_views.Judaism) AS Judaism,
+       MAX(rel_views.Unaffiliated_Religions) AS Unaffiliated_Religions,
+       MAX(rel_views.Hinduism) AS Hinduism,
+       MAX(rel_views.Buddhism) AS Buddhism,
+       MAX(rel_views.Folk_religions) AS Folk_religions,
+       MAX(rel_views.Other_religions) AS Other_religions
 FROM base_table_hdp bth
-LEFT JOIN nwmuz
-ON bth.country = nwmuz.country
+LEFT JOIN rel_views
+ON bth.country = rel_views.country
 WHERE bth.`date` = '2020-01-29'
 GROUP BY bth.country) AS rel
 ON bth.country = rel.country);
@@ -464,9 +463,8 @@ EXCEPT
 SELECT capital_city 
 FROM pre_final_2 pf
 
-
+CREATE TABLE final_flat_table AS (
 SELECT
-	
 	pf.country ,
 	pf.`date` ,
 	pf.tests_performed,
@@ -530,52 +528,8 @@ WHERE time IN ('06:00', '09:00', '12:00', '15:00', '18:00', '20:00') AND city IS
 GROUP BY date, city) AS dd
 ON v.city = dd.city
 ) AS wthr
-ON wthr.xdcity = pf.capital_city AND wthr.formatted_date = pf.`date` ;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+ON wthr.xdcity = pf.capital_city AND wthr.formatted_date = pf.`date` 
+);
 
 
 
