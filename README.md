@@ -16,3 +16,7 @@ Cílem zvoleného SQL skriptu bylo vytvořit flat tabulku, která obsahuje násl
 + průměrná denní (nikoli noční!) teplota
 + počet hodin v daném dni, kdy byly srážky nenulové
 + maximální síla větru v nárazech během dne
+
+Finálně se připravená data statisticky vyhodnocují.
+
+### SQL skript je obsažen v betaapp0.sql
