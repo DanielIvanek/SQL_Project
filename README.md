@@ -1,4 +1,4 @@
-# SQL Projekt - Analýza Šíření Koronaviru v Jednotlivých Státech
+# SQL Projekt - Analýza Šíření Koronaviru v jednotlivých státech
 
 Tento repozitář obsahuje SQL skript pro analýzu faktorů ovlivňujících rychlost šíření koronaviru na úrovni jednotlivých států. Následující README vám poskytne přehled o tom, jak projekt funguje a jak používat výslednou tabulku.
 
