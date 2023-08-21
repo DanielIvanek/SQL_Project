@@ -15,7 +15,8 @@ SELECT
 FROM
     covid19_basic_differences cbd ;*/
 
-   
+    
+#Tvorba zaklad. tabulky + binarni promenne + rocni obdobi
 CREATE TABLE base_table (
 SELECT
 	cbd.date,
@@ -89,6 +90,8 @@ FROM covid19_basic_differences
 */
 
 
+#Pridani do base table ekonomicke ukazatele hdp a dalsi.
+
 CREATE TABLE base_table_hdp
 (
 SELECT  
@@ -148,6 +151,7 @@ WHERE
 	r.YEAR = '2020';
 
 
+#Uprava zemi z tabulky religions abz sedely na tabulku base table
 
 CREATE VIEW rel_pr1 AS (
 SELECT 
@@ -186,33 +190,19 @@ FROM
 	ON bth.country = r.country
 WHERE bth.date IN ('2020-01-29') AND r.`year` = '2020');
 
-
-
-
-
 SELECT *
 FROM rel_pr1;
 
-
-
-
 /*ALTER TABLE engeto_project.economies MODIFY COLUMN country VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL NULL;*/
-
-
-
 
 SELECT country 
 FROM base_table
-
 EXCEPT
-
 SELECT DISTINCT  country 
 FROM economies e;
 
 
-
-
-
+#Tvorba podilu nabozenstvi jako sloupcu tabulky
 create VIEW  rel_views as (
 SELECT country,
 	IF(religion = 'Christianity', round(rel_pop/bth_pop * 100 , 2),0) AS Christianity,
@@ -225,8 +215,6 @@ SELECT country,
 	IF(religion = 'Other Religions', round(rel_pop/bth_pop * 100 , 2),0) AS Other_religions
 FROM rel_pr1
 );
-
-
 /* nabozenstvi */
 SELECT bth.country,
        MAX(rel_views.Christianity) AS Christianity,
@@ -244,16 +232,11 @@ WHERE bth.`date` = '2020-01-29'
 GROUP BY bth.country;
 
 
-
-
 SELECT country
 FROM base_table_hdp bth 
-
 EXCEPT 
-
 SELECT DISTINCT country 
 FROM life_expectancy le
-
 
 /*rozdíl doby dozití */
 SELECT	CASE WHEN country = 'US'
@@ -284,11 +267,7 @@ FROM life_expectancy
 WHERE `year` IN ('1965', '2015')
 GROUP BY country ;
 
-
-
-
-
-#done
+#Tvorba prumerne denni teploty
 SELECT
 	AVG(temp) AS prum_den_tep,
 	city,
@@ -299,10 +278,7 @@ WHERE
 	time IN ('06:00', '09:00', '12:00', '15:00', '18:00', '20:00') AND city IS NOT NULL 
 GROUP BY date, city;
 
-
-
-
-#počet hodin v daném dni, kdy byly srážky nenulové  done 
+#počet hodin v daném dni, kdy byly srážky nenulové
    SELECT
 	DATE_FORMAT(date, '%Y-%m-%d') AS formatted_date,
 	time,
@@ -311,7 +287,7 @@ GROUP BY date, city;
 FROM weather w
 GROUP BY date,city;
 
-
+#Tvorba pohledu z tabulku weather s potrebnymi daty
 CREATE VIEW VW AS (
 SELECT
 	DATE_FORMAT(date, '%Y-%m-%d') AS formatted_date,
@@ -357,11 +333,7 @@ WHERE time IN ('06:00', '09:00', '12:00', '15:00', '18:00', '20:00') AND city IS
 GROUP BY date, city) AS dd
 ON v.city = dd.city;
 
-
-
-
-
-
+# Slozeni pohledu pro kompletaci dat o nabozenstvi
 CREATE TABLE tbl_rel_pre
 (
 SELECT bth.`date` ,
@@ -394,8 +366,7 @@ GROUP BY bth.country) AS rel
 ON bth.country = rel.country);
 
 
-
-
+#Mezikrok pred vytvorenim finalni tabulky
 CREATE VIEW pre_final_1 as (
 SELECT trp.*, round(life.life_expectancy_difference,2) AS life_expectancy_difference
 FROM tbl_rel_pre trp 
@@ -429,8 +400,8 @@ GROUP BY country ) AS life
 ON trp.country = life.acountry);
 
 
-
-CREATE VIEW pre_final_2 AS (
+#Mezikrok pred vytvorenim finalni tabulky
+#CREATE VIEW pre_final_2 AS (
 SELECT
 	pf.*,
 	c.capital_city
@@ -452,18 +423,18 @@ LEFT JOIN (
 	FROM
 		countries) AS c
 ON
-	c.country = pf.country);
+	c.country = pf.country;
 
 
 SELECT city 
 FROM weather w 
-
 EXCEPT 
-
 SELECT capital_city 
 FROM pre_final_2 pf
 
-CREATE TABLE final_flat_table AS (
+
+#Tvorba finalni tabulky s pozadovanymi daty
+CREATE TABLE final_flat_table_test2 AS (
 SELECT
 	pf.country ,
 	pf.`date` ,
@@ -521,14 +492,15 @@ LEFT JOIN
 FROM vw v
 LEFT JOIN (SELECT 
 	AVG(temp) AS prum_den_tep,
-	date,
+	date_format(date,'%Y-%m-%d') AS trydate ,
 	city
 FROM weather w
-WHERE time IN ('06:00', '09:00', '12:00', '15:00', '18:00', '20:00') AND city IS NOT NULL 
-GROUP BY date, city) AS dd
-ON v.city = dd.city
+WHERE time IN ('06:00', '09:00', '12:00', '15:00', '18:00', '20:00') AND city IS NOT NULL
+GROUP BY trydate, city) AS dd
+ON v.city = dd.city AND  v.formatted_date = dd.trydate
 ) AS wthr
 ON wthr.xdcity = pf.capital_city AND wthr.formatted_date = pf.`date` 
+#WHERE pf.date IS NOT null
 );
 
 
