@@ -5,9 +5,8 @@ Tento repozitář obsahuje SQL skript pro analýzu faktorů ovlivňujících ryc
 ## Obsah Repozitáře
 
 - `sql_script.sql`: SQL skript obsahující kód pro vytvoření databáze a generování výsledné tabulky.
-- `data/`: Složka obsahující potřebná vstupní data.
-- `docs/`: Složka obsahující dokumentaci a popisy výsledných dat.
-- `LICENSE`: Licenční smlouva pro tento projekt.
+- `README.md/`: Složka obsahující informace o projektu.
+
 
 ## Jak Používat SQL Skript
 
